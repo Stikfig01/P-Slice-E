@@ -14,12 +14,13 @@ class CrashServer
 	public inline static function setupInstanceId()
 	{
 		#if FIREBASE_CRASH_HANDLER
-		trace("Setting instance id");
+		trace("Setting instance id: ");
 		if (FlxG.save.data.buildId == null)
 		{
 			FlxG.save.data.buildId = new flixel.math.FlxRandom().int();
 			FlxG.save.flush();
 		}
+		trace(FlxG.save.data.buildId);
 		Crashlytics.setUserId(FlxG.save.data.buildId);
 		#end
 	}
