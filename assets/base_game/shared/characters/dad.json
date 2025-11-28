@@ -1,78 +1,79 @@
 {
 	"animations": [
 		{
-			"offsets": [-9, 10],
 			"loop": false,
+			"offsets": [-9, 10],
+			"fps": 24,
 			"anim": "singLEFT",
-			"fps": 24,
-			"name": "singLEFT",
-			"indices": []
-		},
-		{
-			"offsets": [0, -30],
-			"loop": false,
-			"anim": "singDOWN",
-			"fps": 24,
-			"name": "singDOWN",
-			"indices": []
-		},
-		{
-			"offsets": [-6, 50],
-			"loop": false,
-			"anim": "singUP",
-			"fps": 24,
-			"name": "singUP",
-			"indices": []
-		},
-		{
-			"offsets": [0, 27],
-			"loop": false,
-			"anim": "singRIGHT",
-			"fps": 24,
-			"name": "singRIGHT",
-			"indices": []
-		},
-		{
-			"offsets": [0, 0],
-			"loop": false,
-			"anim": "idle",
-			"fps": 24,
-			"name": "idle",
-			"indices": []
-		},
-		{
-			"offsets": [0, 0],
-			"loop": true,
-			"fps": 24,
-			"anim": "idle-loop",
-			"indices": [11, 12, 13, 13],
-			"name": "idle"
-		},
-		{
-			"offsets": [-9, 10],
-			"loop": true,
-			"fps": 24,
-			"anim": "singLEFT-loop",
-			"indices": [12, 13, 14, 15],
+			"indices": [],
 			"name": "singLEFT"
 		},
 		{
-			"offsets": [0, 27],
-			"loop": true,
+			"loop": false,
+			"offsets": [1, -31],
 			"fps": 24,
-			"anim": "singRIGHT-loop",
-			"indices": [12, 13, 14, 15],
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "singDOWN"
+		},
+		{
+			"loop": false,
+			"offsets": [-9, 50],
+			"fps": 24,
+			"anim": "singUP",
+			"indices": [],
+			"name": "singUP"
+		},
+		{
+			"loop": false,
+			"offsets": [-3, 26],
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
 			"name": "singRIGHT"
 		},
 		{
-			"offsets": [-6, 50],
-			"loop": true,
+			"loop": false,
+			"offsets": [0, 0],
 			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "idle"
+		},
+		{
+			"loop": true,
+			"offsets": [0, 0],
+			"anim": "idle-loop",
+			"fps": 24,
+			"name": "idle",
+			"indices": [11, 12, 13, 13]
+		},
+		{
+			"loop": true,
+			"offsets": [-9, 10],
+			"anim": "singLEFT-loop",
+			"fps": 24,
+			"name": "singLEFT",
+			"indices": [12, 13, 14, 15]
+		},
+		{
+			"loop": true,
+			"offsets": [-3, 26],
+			"anim": "singRIGHT-loop",
+			"fps": 24,
+			"name": "singRIGHT",
+			"indices": [12, 13, 14, 15]
+		},
+		{
+			"loop": true,
+			"offsets": [-9, 50],
 			"anim": "singUP-loop",
-			"indices": [12, 13, 14, 15],
-			"name": "singUP"
+			"fps": 24,
+			"name": "singUP",
+			"indices": [12, 13, 14, 15]
 		}
 	],
+	"vocals_file": "",
 	"no_antialiasing": false,
 	"image": "characters/DADDY_DEAREST",
 	"position": [0, 0],
