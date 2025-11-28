@@ -1,8 +1,5 @@
 package states.stages.objects;
 
-#if LEGACY_PSYCH
-using mikolka.compatibility.stages.misc.CharUtills;
-#end
 class PhillyTrain extends BGSprite
 {
 	public var sound:FlxSound;
@@ -34,7 +31,7 @@ class PhillyTrain extends BGSprite
 				if (sound.time >= 4700)
 				{
 					startedMoving = true;
-					if (PlayState.instance.gf != null && PlayState.instance.gf.hasAnimation('hairBlow'))
+					if (PlayState.instance.gf != null)
 					{
 						PlayState.instance.gf.playAnim('hairBlow');
 						PlayState.instance.gf.specialAnim = true;
@@ -83,7 +80,7 @@ class PhillyTrain extends BGSprite
 
 	public function restart():Void
 	{
-		if(PlayState.instance.gf != null && PlayState.instance.gf.hasAnimation('hairFall'))
+		if(PlayState.instance.gf != null)
 		{
 			PlayState.instance.gf.danced = false; //Makes she bop her head to the correct side once the animation ends
 			PlayState.instance.gf.playAnim('hairFall');

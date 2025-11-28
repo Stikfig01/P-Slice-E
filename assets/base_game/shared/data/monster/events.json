@@ -225,7 +225,7 @@
 		[
 			141858.179681786,
 			[
-				["Target Camera", "0", "0,0,2,CLASSIC"]
+				["Target Camera", "1", "0,0,2,CLASSIC"]
 			]
 		],
 		[
@@ -249,7 +249,7 @@
 		[
 			157670.679681786,
 			[
-				["Target Camera", "0", "0,0,12,CLASSIC"]
+				["Target Camera", "1", "0,0,12,CLASSIC"]
 			]
 		],
 		[
