@@ -38,6 +38,10 @@ class Mall extends BaseStage
 		var fgSnow:BGSprite = new BGSprite('christmas/fgSnow', -1150, 680);
 		add(fgSnow);
 
+		var snowUnder:BGSprite = new BGSprite(null, -1200, 800);
+		snowUnder.makeGraphic(5400, 3000, 0xFFF3F4F5);
+		add(snowUnder);
+
 		Paths.sound('Lights_Shut_off');
 		setDefaultGF('gf-christmas');
 

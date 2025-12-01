@@ -49,8 +49,13 @@ class MallXmasErect extends BaseStage
 		bottomBoppers = new MallCrowd(-300, 140,'christmas/erect/bottomBop',"bottomBop");
 		add(bottomBoppers);
 
-		var fgSnow:BGSprite = new BGSprite('christmas/erect/fgSnow', -880, 700);
+		var fgSnow:BGSprite = new BGSprite('christmas/fgSnow', -1350, 680);
+		fgSnow.scale.set(1.1, 1);
 		add(fgSnow);
+
+		var snowUnder:BGSprite = new BGSprite(null, -1500, 800);
+		snowUnder.makeGraphic(5700, 3000, 0xFFF3F4F5);
+		add(snowUnder);
 
 		setDefaultGF('gf-christmas');
 
