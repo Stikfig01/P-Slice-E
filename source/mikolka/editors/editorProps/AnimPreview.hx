@@ -1,11 +1,10 @@
 package mikolka.editors.editorProps;
 
 import mikolka.vslice.components.crash.UserErrorSubstate;
-import flxanimate.animate.FlxSymbol;
 
 class AnimPreview extends FlxTypedSpriteGroup<FlxSprite>
 {
-	public var activeSprite:FlxAtlasSprite;
+	public var activeSprite:FunkinSprite;
 
 	var selectedFrame:Int = 0;
 	var selectedAnimIndices:Array<Int>;
@@ -20,7 +19,7 @@ class AnimPreview extends FlxTypedSpriteGroup<FlxSprite>
 		this.useAtlasSymbols = useAtlasSymbols;
 		super(x,y);
 	}
-	public function attachSprite(value:FlxAtlasSprite)
+	public function attachSprite(value:FunkinSprite)
 	{
 		anims = new Array();
 		labels = new Array();
@@ -30,7 +29,7 @@ class AnimPreview extends FlxTypedSpriteGroup<FlxSprite>
 			remove(s);
 		});
         if(value == null){
-            activeSprite?.onAnimationFrame.remove(onFrameAdvance);
+            activeSprite?.anim.onFrameChange.remove(onFrameAdvance);
             activeSprite = null;
             return;
         }
@@ -41,21 +40,21 @@ class AnimPreview extends FlxTypedSpriteGroup<FlxSprite>
 
 		
 		registerAnims(value);
-		value.onAnimationFrame.add(onFrameAdvance);
-		activeSprite?.onAnimationFrame.remove(onFrameAdvance);
+		value.anim.onFrameChange.add(onFrameAdvance);
+		activeSprite?.anim.onFrameChange.remove(onFrameAdvance);
 		activeSprite = value;
 
 		if(labels.length == 0){
 			UserErrorSubstate.makeMessage("No animations registered",
 			"Looks like you haven't registered any animations.\n\nHave you exported your sprite correctly?");
-            activeSprite?.onAnimationFrame.remove(onFrameAdvance);
+            activeSprite?.anim.onFrameChange.remove(onFrameAdvance);
             activeSprite = null;
         }
 		else input_selectAnim(0);
 
 	}
 
-	private function registerAnims(value:FlxAtlasSprite) {
+	private function registerAnims(value:FunkinSprite) {
 		for (x in value.listAnimations())
 			{
 				addAnim({
@@ -82,10 +81,10 @@ class AnimPreview extends FlxTypedSpriteGroup<FlxSprite>
 
 	public function input_selectFrame(diff:Int = 0)
 	{
-		activeSprite.pauseAnimation();
+		activeSprite.anim.pause();
         var newFrame = Std.int(FlxMath.bound(selectedFrame+diff,1,selectedAnimLength));
-		if(useAtlasSymbols) activeSprite.anim.curFrame = newFrame-1;
-		else activeSprite.anim.curFrame = selectedAnimIndices[newFrame-1];
+		if(useAtlasSymbols) activeSprite.anim.curAnim.curFrame = newFrame-1;
+		else activeSprite.anim.curAnim.curFrame = selectedAnimIndices[newFrame-1];
 		
         selectedFrame = newFrame;
         frameTxt.text = 'Frame (${selectedFrame}/${selectedAnimLength})';
@@ -97,7 +96,7 @@ class AnimPreview extends FlxTypedSpriteGroup<FlxSprite>
 		var newAnim = anims[selectedIndex];
         selectedFrame = useAtlasSymbols ? 1 : 0;
         selectedAnimLength = 0;
-		activeSprite.playAnimation(newAnim.anim, true);
+		activeSprite.anim.play(newAnim.anim, true);
 	}
 
 	private function addAnim(anim:CharAnim)
@@ -117,13 +116,11 @@ class AnimPreview extends FlxTypedSpriteGroup<FlxSprite>
 		add(flxTxt);
 	}
 
-	private function onFrameAdvance(anim:String, frame:Int)
+	private function onFrameAdvance(anim:String, frame:Int ,frameIndex:Int)
 	{
-		var mainSymbol = activeSprite.anim.curSymbol;
-		var symbol = mainSymbol.getFrameLabel(anim);
         if(selectedAnimLength == 0) {
-            selectedAnimIndices = symbol.getFrameIndices();
-            selectedAnimLength = symbol.getFrameIndices().length; // timeline.totalFrames;
+            selectedAnimIndices = activeSprite.anim.curAnim.frames;
+            selectedAnimLength = activeSprite.anim.curAnim.frames.length; // timeline.totalFrames;
         }
 		// var labelFrame = indices.indexOf(frame);
 		// if (labelFrame == -1)
