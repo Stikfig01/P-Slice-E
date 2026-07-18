@@ -14,7 +14,7 @@ class TwoPicos
 	var cutsceneHandler:CutsceneHandler;
 	public var imposterPico:PicoDopplegangerSprite;
 	var pico:PicoDopplegangerSprite;
-	var bloodPool:FlxAnimate;
+	var bloodPool:FunkinSprite;
 	var cigarette:FlxSprite;
 	var audioPlaying:FlxSound;
 
@@ -39,21 +39,18 @@ class TwoPicos
 		host.camHUD.visible = false;
 		// inCutscene = true; //this would stop the camera movement, oops
 
-		imposterPico = new PicoDopplegangerSprite(host.dad.x + 82, host.dad.y + 400);
-		imposterPico.showPivot = false;
+		imposterPico = new PicoDopplegangerSprite(host.dad.x - 500, host.dad.y - 200);
 		imposterPico.antialiasing = VsliceOptions.ANTIALIASING;
 		cutsceneHandler.push(imposterPico);
 
-		pico = new PicoDopplegangerSprite(host.boyfriend.x + 48.5, host.boyfriend.y + 400);
-		pico.showPivot = false;
+		pico = new PicoDopplegangerSprite(host.boyfriend.x - 458.5, host.boyfriend.y - 200);
 		pico.antialiasing = VsliceOptions.ANTIALIASING;
 		cutsceneHandler.push(pico);
 
 		if (VsliceOptions.NAUGHTYNESS)
 		{
-			bloodPool = new FlxAnimate(0, 0);
+			bloodPool = new FunkinSprite(0, 0).loadTextureAtlas("philly/erect/cutscenes/bloodPool");
 			bloodPool.visible = false;
-			Paths.loadAnimateAtlas(bloodPool, "philly/erect/cutscenes/bloodPool");
 		}
 
 		cigarette = new FlxSprite();
@@ -95,8 +92,10 @@ class TwoPicos
 			{
 				if (playerShoots)
 				{
-					if (seenOutcome)
-						imposterPico.playAnimation("loopOpponent", true, true, true);
+					if (seenOutcome){
+						imposterPico.anim.play("loopOpponent", true, true);
+						imposterPico.anim.curAnim.looped = true;
+					}
 					else
 					{
 						imposterPico.kill();
@@ -109,7 +108,8 @@ class TwoPicos
 				{
 					if (seenOutcome)
 					{
-						pico.playAnimation("loopPlayer", true, true, true);
+						pico.anim.play("loopPlayer", true, true);
+						pico.anim.curAnim.looped = true;
 						FlxG.sound.music.fadeTween?.cancel();
 						game.endSong();
 					}
