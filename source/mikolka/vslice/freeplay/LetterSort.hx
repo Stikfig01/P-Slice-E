@@ -164,9 +164,9 @@ class LetterSort extends FlxTypedSpriteGroup<FlxSprite>
 }
 
 /**
- * The actual FunkinSprite for the letters, with their animation code stuff and regex stuff
+ * The actual FlxAtlasSprite for the letters, with their animation code stuff and regex stuff
  */
-class FreeplayLetter extends FunkinSprite
+class FreeplayLetter extends FlxAtlasSprite
 {
   /**
    * A preformatted array of letter strings, for use when doing regex
@@ -185,17 +185,15 @@ class FreeplayLetter extends FunkinSprite
    */
   public var curLetter:Int = 0;
 
-  public function new(x:Float, y:Float, ?letterInd:Int, curSelected:Int = 0)
+  public function new(x:Float, y:Float, ?letterInd:Int)
   {
-    super(x, y);
-
-    loadTextureAtlas("freeplay/sortedLetters");
+    super(x, y, "freeplay/sortedLetters");
 
     // this is used for the regex
     // /^[OR].*/gi doesn't work for showing the song Pico, so now it's
     // /^[O-R].*/gi ant it works for displaying Pico
     // https://regex101.com/r/bWFPfS/1
-    // we split by underscores, simply for nice lil convenience
+    // we split by underscores, simply for nice lil convinience
     var alphabet:String = 'A-B_C-D_E-H_I-L_M-N_O-R_S_T_U-Z';
     regexLetters = alphabet.split('_');
     regexLetters.insert(0, 'ALL');
@@ -203,25 +201,17 @@ class FreeplayLetter extends FunkinSprite
     regexLetters.insert(0, '#');
 
     // the symbols from flash don't have dashes, so we clean this up for use with animations
-    // (we don't need to re-export, rule of thumb is to accommodate files named in flash from dave
+    // (we don't need to re-export, rule of thumb is to accomodate files named in flash from dave
     //    until we get him programming classes (and since i cant find the .fla file....))
     animLetters = regexLetters.map(animLetter -> animLetter.replace('-', ''));
-    for(letterName in animLetters){
-      addAnimationIfMissing(letterName + " move");
-    }
 
     if (letterInd != null)
     {
-      this.anim.play(animLetters[letterInd] + " move", true);
+      this.anim.play(animLetters[letterInd] + " move");
+      this.anim.pause();
       curLetter = letterInd;
-
-      if (curSelected != curLetter)
-      {
-        this.anim.pause();
-      }
-
-      this.anim.onFinish.add(function(name:String) {
-        this.anim.play(animLetters[curLetter] + " move", true);
+      this.anim.onComplete.add(function() {
+        this.anim.play(animLetters[curLetter] + " move");
       });
     }
   }
@@ -255,17 +245,6 @@ class FreeplayLetter extends FunkinSprite
     {
       this.anim.pause();
     }
-  }
-
-  /**
-   * Offset the letter.
-   */
-  override function getScreenPosition(?result:FlxPoint, ?camera:FlxCamera):FlxPoint
-  {
-    var output:FlxPoint = super.getScreenPosition(result, camera);
-    output.x -= 50;
-    output.y -= 60;
-    return output;
+    // updateHitbox();
   }
 }
-

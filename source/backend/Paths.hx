@@ -1,8 +1,5 @@
 package backend;
 
-import haxe.Json;
-import animate.FlxAnimateJson.AnimationJson;
-import animate.FlxAnimateFrames;
 import haxe.io.Path;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.FlxGraphic;
@@ -312,11 +309,9 @@ class Paths
 	}
 	#end
 
-	public static function loadAnimateAtlas(folderOrImg:Dynamic, spriteJson:Dynamic = null, animationJson:Dynamic = null,settings:FlxAnimateSettings = null):Null<FlxAnimateFrames>
+	#if flxanimate
+	public static function loadAnimateAtlas(spr:FlxAnimate, folderOrImg:Dynamic, spriteJson:Dynamic = null, animationJson:Dynamic = null)
 	{
-		var imageKey:String = null;
-		var animData:AnimationJson = null;
-
 		if (folderOrImg is String)
 		{
 			var dir = getPath("images/" + folderOrImg);
@@ -324,45 +319,26 @@ class Paths
 			if (spriteJson == null)
 			{
 				if (NativeFileSystem.exists(Path.join([dir, "spritemap1.json"])))
-					spriteJson = NativeFileSystem.getContent(Path.join([dir, "spritemap1.json"])).replace("﻿"," ");
+					spriteJson = NativeFileSystem.getContent(Path.join([dir, "spritemap1.json"]));
 				else
 				{
 					trace(Path.join([dir, "spritemap1.json"]) + " is missing!!");
-					return null;
+					return;
 				}
 			}
 			if (animationJson == null)
 			{
-				if(FunkinSprite.ANIMATION_OBJECTS.exists(folderOrImg)){
-					trace("Cache hit!");
-					animData = FunkinSprite.ANIMATION_OBJECTS.get(folderOrImg);
-				}
-				else if (NativeFileSystem.exists(Path.join([dir, "Animation.json"]))){
+				if (NativeFileSystem.exists(Path.join([dir, "Animation.json"])))
 					animationJson = NativeFileSystem.getContent(Path.join([dir, "Animation.json"]));
-					animData = Json.parse(animationJson);
-				}
 				else
 				{
 					trace(Path.join([dir, "Animation.json"]) + " is missing!!");
-					return null;
+					return;
 				}
 			}
-			else{
-				animData = Json.parse(animationJson);
-			}
-			imageKey = Path.join([folderOrImg, "spritemap1"]);
-			folderOrImg = image(imageKey);
+			folderOrImg = image(Path.join([folderOrImg, "spritemap1"]));
 		}
-		
-		// Apparently those files can have garbage data because ????
-		//* https://www.fileformat.info/info/unicode/char/feff/index.htm
-		var frames = FlxAnimateFrames.fromAnimate(animData,
-			[{json:spriteJson,source:folderOrImg}]
-			,null,imageKey,false,settings);
-		var Img:FlxGraphic = cast folderOrImg;
-		// Stop flixel-animate from destroying graphics
-		// because we do that
-		frames.parent.destroyOnNoUse = false;
-		return frames;
+		spr.loadAtlasEx(folderOrImg, spriteJson, animationJson);
 	}
+	#end
 }

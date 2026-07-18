@@ -15,8 +15,8 @@ class MallXmasErect extends BaseStage
 	var bottomBoppers:MallCrowd;
 	var santa:BGSprite;
 	
-	var erectSanta:FunkinSprite;
-	var erectParents:FunkinSprite;
+	var erectSanta:FlxAtlasSprite;
+	var erectParents:FlxAtlasSprite;
 
 	override function create()
 	{
@@ -60,8 +60,8 @@ class MallXmasErect extends BaseStage
 		setDefaultGF('gf-christmas');
 
 		if(songName == "eggnog-erect" || songName == "eggnog-(pico-mix)"){
-			erectSanta = FunkinSprite.createTextureAtlas(-840 +380, 150 +347,"christmas/santa_speaks_assets");
-			erectParents = FunkinSprite.createTextureAtlas(100 -620, 100 + 401,"christmas/parents_shoot_assets");	
+			erectSanta = new FlxAtlasSprite(-840 +380, 150 +347,"christmas/santa_speaks_assets");
+			erectParents = new FlxAtlasSprite(100 -620, 100 + 401,"christmas/parents_shoot_assets");	
 			setEndCallback(eggnogEndCutscene);
 		}
 	}
@@ -127,11 +127,11 @@ class MallXmasErect extends BaseStage
 		add(erectParents);
 		add(erectSanta);
 
-		erectSanta.anim.play("santa whole scene", false, false, 0);
-		erectParents.anim.play("parents whole scene", false, false, 0);
+		erectSanta.playAnimation("santa whole scene", false, false, false, 0);
+		erectParents.playAnimation("parents whole scene", false, false, false, 0);
 		FlxG.sound.play(Paths.sound("santa_emotion"));
-    	erectSanta.anim.onFinish.add(s ->erectSanta.anim.pause());
-    	erectParents.anim.onFinish.add(s ->erectParents.anim.pause());
+    	erectSanta.onAnimationComplete.add(s ->erectSanta.anim.pause());
+    	erectParents.onAnimationComplete.add(s ->erectParents.anim.pause());
 
 		new FlxTimer().start(2.8, function(tmr)
 			{

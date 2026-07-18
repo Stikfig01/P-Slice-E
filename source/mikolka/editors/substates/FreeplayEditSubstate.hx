@@ -29,7 +29,7 @@ class FreeplayEditSubstate extends MusicBeatSubstate
 	var animsList:Array<AnimationData>;
 	var loaded:Bool = false;
 
-	public var dj:FunkinSprite;
+	public var dj:FlxAtlasSprite;
 	public var dj_anim:DJAnimPreview;
 
 	public var backingCard:BoyfriendCard;
@@ -94,14 +94,14 @@ class FreeplayEditSubstate extends MusicBeatSubstate
 		add(ostName);
 
 		try{
-			dj = FunkinSprite.createTextureAtlas((CUTOUT_WIDTH * DJ_POS_MULTI) + 640, 366, data.getFreeplayDJData().getAssetPath());
+			dj = new FlxAtlasSprite((CUTOUT_WIDTH * DJ_POS_MULTI) + 640, 366, data.getFreeplayDJData().getAtlasPath());
 		}
 		catch(x){
 			trace(x);
-			dj = FunkinSprite.createTextureAtlas((CUTOUT_WIDTH * DJ_POS_MULTI) + 640, 366, "freeplay/freeplay-boyfriend");
+			dj = new FlxAtlasSprite((CUTOUT_WIDTH * DJ_POS_MULTI) + 640, 366, "freeplay/freeplay-boyfriend");
 		}
 		add(dj);
-		dj.anim.play(data.getFreeplayDJData().getAnimationPrefix("idle"));
+		dj.playAnimation(data.getFreeplayDJData().getAnimationPrefix("idle"));
 		dj_anim = new DJAnimPreview(true,100, 100);
 		dj_anim.visible = false;
 		dj_anim.dj = data;

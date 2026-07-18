@@ -16,9 +16,7 @@ import mikolka.vslice.freeplay.backcards.BoyfriendCard;
 import shaders.BlueFade;
 import mikolka.funkin.freeplay.FreeplayStyle;
 import mikolka.vslice.freeplay.backcards.BackingCard;
-import mikolka.vslice.freeplay.dj.BaseFreeplayDJ;
-import mikolka.vslice.freeplay.dj.BoyfriendFreeplayDJ;
-import mikolka.vslice.freeplay.dj.AnimateAtlasFreeplayDJ;
+import mikolka.vslice.freeplay.DJBoyfriend.FreeplayDJ;
 import mikolka.compatibility.ModsHelper;
 import mikolka.compatibility.VsliceOptions;
 import mikolka.compatibility.funkin.FunkinCamera;
@@ -185,7 +183,7 @@ class FreeplayState extends MusicBeatSubstate
 	}
 	var curPlaying:Bool = false;
 
-	var dj:Null<BaseFreeplayDJ> = null;
+	var dj:Null<FreeplayDJ> = null;
 
 	var ostName:FlxText;
 	var albumRoll:AlbumRoll;
@@ -406,22 +404,14 @@ class FreeplayState extends MusicBeatSubstate
 		{
 			ModsHelper.loadModDir(VsliceOptions.LAST_MOD.mod_dir); // ? make sure to load a mod dir of this character!
 			// ? Low quality. why we need him again?
-			// TODO Add support for sparrow sprites
 			if (!VsliceOptions.LOW_QUALITY)
 			{
-				switch(currentCharacterId){
-					case "bf":
-						dj = new BoyfriendFreeplayDJ((CUTOUT_WIDTH * DJ_POS_MULTI) , 0, currentCharacterId);
-					// case "pico":
-					// 	dj = new BoyfriendFreeplayDJ((CUTOUT_WIDTH * DJ_POS_MULTI), 0, currentCharacterId);
-					default:
-						dj = new AnimateAtlasFreeplayDJ((CUTOUT_WIDTH * DJ_POS_MULTI) , 0, currentCharacterId);
-
-				}
+				dj = new FreeplayDJ((CUTOUT_WIDTH * DJ_POS_MULTI) + 640, 366, currentCharacter);
 				exitMovers.set([dj], {
 					x: -dj.width * 1.6,
 					speed: 0.5
 				});
+				add(dj);
 				exitMoversCharSel.set([dj], {
 					y: -175,
 					speed: 0.8,
@@ -461,8 +451,6 @@ class FreeplayState extends MusicBeatSubstate
 		});
 
 		if(VsliceOptions.LOW_QUALITY) add(backingImage);
-
-		if (dj != null) add(dj);
 
 		grpDifficulties = new FlxTypedSpriteGroup<DifficultySprite>(-300, 80);
 		add(grpDifficulties);
@@ -1900,7 +1888,6 @@ class FreeplayState extends MusicBeatSubstate
 	{
 		controls.isInSubstate = false;
 		super.destroy();
-
 		var daSong:Null<FreeplaySongData> = currentFilteredSongs[curSelected];
 		if (daSong != null)
 		{
@@ -2217,7 +2204,7 @@ class FreeplayState extends MusicBeatSubstate
 		// Visual and audio effects.
 		FunkinSound.playOnce(Paths.sound('confirmMenu'));
 		if (dj != null)
-			dj.onConfirm();
+			dj.confirm();
 
 		curCapsule.animBox.forcePosition();
 		curCapsule.confirm();
@@ -2392,7 +2379,7 @@ class FreeplayState extends MusicBeatSubstate
 				onLoad: function()
 				{
 					// ? onLoad doesn't start plaing music automatically here
-					var endVolume = dj.getMusicPreviewMult() * FADE_IN_END_VOLUME;
+					var endVolume = dj?.playingCartoon ? 0.1 : FADE_IN_END_VOLUME;
 					FlxG.sound.music.fadeIn(FADE_IN_DURATION, FADE_IN_START_VOLUME, endVolume);
 					// ? set BPMs
 					var newBPM = daSongCapsule.songData.songStartingBpm;

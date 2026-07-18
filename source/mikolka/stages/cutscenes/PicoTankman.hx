@@ -20,7 +20,7 @@ class PicoTankman {
     	shader.angle = 45;
 		shader.threshold = 0.3;
 		shaderCamera = new ShaderFilter(shader);
-		tankmanEnding = FunkinSprite.createTextureAtlas(-200,75,"erect/cutscene/tankmanEnding");
+		tankmanEnding = new FlxAtlasSprite(520,350,"erect/cutscene/tankmanEnding");
 		cutsceneSounds = new FlxSound().loadEmbedded(Paths.sound('erect/endCutscene'));
 		bgSprite = new FunkinSprite(0, 0);
 		bgSprite.makeSolidColor(2000, 2500, 0xFF000000);
@@ -31,7 +31,7 @@ class PicoTankman {
 	var cutscene:CutsceneHandler;
 	var stage:TankErect;
 	var shaderCamera:ShaderFilter;
-	var tankmanEnding:FunkinSprite;
+	var tankmanEnding:FlxAtlasSprite;
 	var cutsceneSounds:FlxSound;
 	var bgSprite:FunkinSprite;
 
@@ -47,7 +47,7 @@ class PicoTankman {
 			FlxTween.tween(game.camFollow,{ x:tankmanPos[0] + 320, y:tankmanPos[1] - 70}, 2.8, { ease:FlxEase.expoOut});
 			game.defaultCamZoom = 0.65;
 			game.dad.visible = false;
-			tankmanEnding.anim.play("tankman stress ending", true, false);
+			tankmanEnding.playAnimation("tankman stress ending", true, false, false);
     		cutsceneSounds.play();
 		};
 		cutscene.finishCallback = () ->{

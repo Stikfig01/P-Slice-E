@@ -15,8 +15,8 @@ class TankStageScenes {
 	var stage:Tank;
     var game:PlayState;
 	var cutsceneHandler:CutsceneHandler;
-	var tankman:FunkinSprite;
-	var pico:FunkinSprite;
+	var tankman:FlxAnimate;
+	var pico:FlxAnimate;
 	var boyfriendCutscene:FlxSprite;
 	var audioPlaying:FlxSound;
 	function prepareCutscene()
@@ -27,8 +27,9 @@ class TankStageScenes {
 		game.camHUD.visible = false;
 		//inCutscene = true; //this would stop the camera movement, oops
 
-		tankman = new FunkinSprite(game.dad.x + 419, game.dad.y + 225);
-		tankman.loadTextureAtlas('cutscenes/tankman');
+		tankman = new FlxAnimate(game.dad.x + 419, game.dad.y + 225);
+		tankman.showPivot = false;
+		Paths.loadAnimateAtlas(tankman, 'cutscenes/tankman');
 		tankman.antialiasing = VsliceOptions.ANTIALIASING;
 		stage.addBehindDad(tankman);
 		cutsceneHandler.push(tankman);
@@ -178,8 +179,9 @@ class TankStageScenes {
 		});
 		Paths.sound('stressCutscene');
 
-		pico = new FunkinSprite(game.gf.x + 150, game.gf.y + 450);
-		pico.loadTextureAtlas('cutscenes/picoAppears');
+		pico = new FlxAnimate(game.gf.x + 150, game.gf.y + 450);
+		pico.showPivot = false;
+		Paths.loadAnimateAtlas(pico, 'cutscenes/picoAppears');
 		pico.antialiasing = VsliceOptions.ANTIALIASING;
 		pico.anim.addBySymbol('dance', 'GF Dancing at Gunpoint', 24, true);
 		pico.anim.addBySymbol('dieBitch', 'GF Time to Die sequence', 24, false);
@@ -190,8 +192,8 @@ class TankStageScenes {
 		cutsceneHandler.push(pico);
 
 		// prepare pico animation cycle
-		function picoStressCycle(animName:String) {
-			switch (pico.anim.name) {
+		function picoStressCycle() {
+			switch (pico.anim.curInstance.symbol.name) {
 				case "dieBitch", "GF Time to Die sequence":
 					pico.anim.play('picoAppears', true);
 					game.boyfriendGroup.alpha = 1;
@@ -210,11 +212,11 @@ class TankStageScenes {
 				case "picoEnd", "Pico Dual Wield on Speaker idle":
 					game.gfGroup.alpha = 1;
 					pico.visible = false;
-					if (pico.anim.onFinish.has(picoStressCycle)) // for safety
-						pico.anim.onFinish.remove(picoStressCycle);
+					if (pico.anim.onComplete.has(picoStressCycle)) // for safety
+						pico.anim.onComplete.remove(picoStressCycle);
 			}
 		}
-		pico.anim.onFinish.add(picoStressCycle);
+		pico.anim.onComplete.add(picoStressCycle);
 
 		boyfriendCutscene = new FlxSprite(game.boyfriend.x + 5, game.boyfriend.y + 20);
 		boyfriendCutscene.antialiasing = VsliceOptions.ANTIALIASING;

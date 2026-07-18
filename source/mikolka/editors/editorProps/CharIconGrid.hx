@@ -22,11 +22,7 @@ class CharIconGrid extends FlxTypedSpriteGroup<FlxSprite>{
     
             for (i in 0...9)
             {
-                var temp:Lock = new Lock(0, 0, i,
-                {
-                    swfMode: true,
-                    uniqueInCache: true
-                });
+                var temp:Lock = new Lock(0, 0, i);
                 temp.ID = 1;
                 add(temp);
             }

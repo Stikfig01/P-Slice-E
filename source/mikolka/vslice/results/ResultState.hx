@@ -4,6 +4,7 @@ import mikolka.funkin.custom.mobile.MobileScaleMode;
 import haxe.Exception;
 import mikolka.compatibility.ModsHelper;
 import mikolka.compatibility.VsliceOptions;
+import mikolka.funkin.FlxAtlasSprite;
 import mikolka.funkin.FunkinSprite;
 import mikolka.funkin.players.PlayerData;
 import flixel.FlxSubState;
@@ -66,7 +67,7 @@ class ResultState extends MusicBeatSubState
 
   var characterAtlasAnimations:Array<
     {
-      sprite:FunkinSprite,
+      sprite:FlxAtlasSprite,
       delay:Float,
       forceLoop:Bool,
       startFrameLabel:String,
@@ -243,39 +244,42 @@ class ResultState extends MusicBeatSubState
           // offsets[0] -= xDiff*1.8;
           // offsets[1] -= yDiff*1.8;
 
-          var animation:FunkinSprite = FunkinSprite.createTextureAtlas(offsets[0] + MobileScaleMode.gameNotchSize.x, offsets[1], animPath);
+          var animation:FlxAtlasSprite = new FlxAtlasSprite(offsets[0] + MobileScaleMode.gameNotchSize.x, offsets[1], animPath);
           animation.zIndex = animData.zIndex ?? 500;
           animation.scale.set(animData.scale ?? 1.0, animData.scale ?? 1.0);
 
           if (!(animData.looped ?? true))
-          {
-            // Animation is not looped.
-            animation.anim.onFinish.add((_name:String) -> {
-              if (animation != null)
-              {
-                animation.anim.pause();
-              }
-            });
-          }
+            {
+              // Animation is not looped.
+              animation.onAnimationComplete.add((_name:String) -> {
+                trace("AHAHAH 2");
+                if (animation != null)
+                {
+                  animation.anim.pause();
+                }
+              });
+            }
             else if (animData.loopFrameLabel != null)
-          {
-            animation.anim.onFinish.add((_name:String) -> {
-              if (animation != null)
-              {
-                animation.anim.play(animData.loopFrameLabel ?? '', true); // unpauses this anim, since it's on PlayOnce!
-                animation.anim.curAnim.looped = true;
-              }
-            });
-          }
-          else if (animData.loopFrame != null)
-          {
-            animation.anim.onFinish.add((_name:String) -> {
-              if (animation != null)
-              {
-                animation.anim.play("", true, false, animData.loopFrame ?? 0); // unpauses this anim, since it's on PlayOnce!
-              }
-            });
-          }
+            {
+              animation.onAnimationComplete.add((_name:String) -> {
+                trace("AHAHAH 2");
+                if (animation != null)
+                {
+                  animation.playAnimation(animData.loopFrameLabel ?? '', true, false, true); // unpauses this anim, since it's on PlayOnce!
+                }
+              });
+            }
+            else if (animData.loopFrame != null)
+            {
+              animation.onAnimationComplete.add((_name:String) -> {
+                if (animation != null)
+                {
+                  trace("AHAHAH");
+                  animation.anim.curFrame = animData.loopFrame ?? 0;
+                  animation.anim.play(); // unpauses this anim, since it's on PlayOnce!
+                }
+              });
+            }
 
           // Hide until ready to play.
           animation.visible = false;
@@ -636,7 +640,7 @@ class ResultState extends MusicBeatSubState
       new FlxTimer().start(atlas.delay, _ -> {
         if (atlas.sprite == null) return;
         atlas.sprite.visible = true;
-        atlas.sprite.anim.play(atlas.startFrameLabel);
+        atlas.sprite.playAnimation(atlas.startFrameLabel);
         if (atlas.sound != "")
         {
           var sndPath:String = Paths.stripLibrary(atlas.sound);
@@ -670,14 +674,14 @@ class ResultState extends MusicBeatSubState
           {
             // Feel the bed fun :freaky:
             case "bf":
-              if (atlas.sprite.anim.frameIndex > 87 && atlas.sprite.anim.frameIndex % 5 == 0)
+              if (atlas.sprite.anim.curFrame > 87 && atlas.sprite.anim.curFrame % 5 == 0)
               {
                 HapticUtil.vibrate(0, 0.01, Constants.MAX_VIBRATION_AMPLITUDE);
                 break;
               }
 
               // GF slams into the wall.
-              if (atlas.sprite.anim.frameIndex == 51)
+              if (atlas.sprite.anim.curFrame == 51)
               {
                 HapticUtil.vibrate(0, 0.01, (Constants.MAX_VIBRATION_AMPLITUDE / 3) * 2.5);
                 break;
@@ -685,7 +689,7 @@ class ResultState extends MusicBeatSubState
 
             // Pico drop-kicking Nene.
             case "pico":
-              if (atlas.sprite.anim.frameIndex == 52)
+              if (atlas.sprite.anim.curFrame == 52)
               {
                 HapticUtil.vibrate(Constants.DEFAULT_VIBRATION_PERIOD, Constants.DEFAULT_VIBRATION_DURATION * 5, Constants.MAX_VIBRATION_AMPLITUDE);
                 break;
@@ -701,14 +705,14 @@ class ResultState extends MusicBeatSubState
             // Pico explodes the targets with a rocket launcher.
             case "pico":
               // Pico shoots.
-              if (atlas.sprite.anim.frameIndex == 45)
+              if (atlas.sprite.anim.curFrame == 45)
               {
                 HapticUtil.vibrate(0, 0.01, (Constants.MAX_VIBRATION_AMPLITUDE / 3) * 2.5);
                 break;
               }
 
               // The targets explode.
-              if (atlas.sprite.anim.frameIndex == 50)
+              if (atlas.sprite.anim.curFrame == 50)
               {
                 HapticUtil.vibrate(Constants.DEFAULT_VIBRATION_PERIOD, Constants.DEFAULT_VIBRATION_DURATION, Constants.MAX_VIBRATION_AMPLITUDE);
                 break;
@@ -723,12 +727,12 @@ class ResultState extends MusicBeatSubState
           {
             // Pico shooting the targets.
             case "pico":
-              if (atlas.sprite.anim.frameIndex % 2 != 0) continue;
+              if (atlas.sprite.anim.curFrame % 2 != 0) continue;
 
               final frames:Array<Array<Int>> = [[40, 50], [80, 90], [140, 157]];
               for (i in 0...frames.length)
               {
-                if (atlas.sprite.anim.frameIndex < frames[i][0] || atlas.sprite.anim.frameIndex > frames[i][1]) continue;
+                if (atlas.sprite.anim.curFrame < frames[i][0] || atlas.sprite.anim.curFrame > frames[i][1]) continue;
 
                 HapticUtil.vibrate(0, 0.01, Constants.MAX_VIBRATION_AMPLITUDE);
                 break;
@@ -743,7 +747,7 @@ class ResultState extends MusicBeatSubState
           {
             // BF falling and GF slams on BF with her ass.
             case "bf":
-              if (atlas.sprite.anim.frameIndex == 5 || atlas.sprite.anim.frameIndex == 90)
+              if (atlas.sprite.anim.curFrame == 5 || atlas.sprite.anim.curFrame == 90)
               {
                 HapticUtil.vibrate(Constants.DEFAULT_VIBRATION_PERIOD * 2, Constants.DEFAULT_VIBRATION_DURATION * 2, Constants.MAX_VIBRATION_AMPLITUDE);
                 break;

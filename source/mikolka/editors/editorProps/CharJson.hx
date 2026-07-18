@@ -27,7 +27,7 @@ class JsonDJ{
             text3 = val.text3;
             animations = val.animations;
             charSelect = val.charSelect;
-            offsets = val.offsets;
+            cartoon = val.cartoon;
             fistPump = val.fistPump;
         }
     }
@@ -37,6 +37,6 @@ class JsonDJ{
     var text3:String = "PROTECT YO NUTS";
     var animations:Array<AnimationData>;
     var charSelect:Null<PlayerFreeplayDJCharSelectData>;
-    var offsets:Null<Array<Float>>;
+    var cartoon:Null<PlayerFreeplayDJCartoonData>;
     var fistPump:Null<PlayerFreeplayDJFistPumpData>;
 }

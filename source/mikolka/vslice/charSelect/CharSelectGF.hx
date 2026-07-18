@@ -1,6 +1,7 @@
 package mikolka.vslice.charSelect;
 
 import haxe.Exception;
+import mikolka.funkin.FlxAtlasSprite;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
 import flixel.math.FlxMath;
@@ -11,24 +12,68 @@ import flixel.math.FlxMath;
 import funkin.vis.dsp.SpectralAnalyzer;
 import mikolka.compatibility.funkin.FunkinPath as Paths;
 
-class CharSelectGF extends FunkinSprite
+class CharSelectGF extends FlxAtlasSprite 
 {
-  var analyzer:Null<SpectralAnalyzer>;
-  var analyzerLevelsCache:Array<Bar> = new Array<Bar>();
+  var fadeTimer:Float = 0;
+  var fadingStatus:FadeStatus = OFF;
+  var fadeAnimIndex:Int = 0;
 
-  var currentGFPath:String = "";
+  var animInInfo:FramesJSFLInfo;
+  var animOutInfo:FramesJSFLInfo;
+
+  var intendedYPos:Float = 0;
+  var intendedAlpha:Float = 0;
+  var list:Array<String> = [];
+
+  var analyzer:SpectralAnalyzer;
+
+  var currentGFPath:Null<String>;
   var enableVisualizer:Bool = false;
 
-  var danceEvery:Int = 2;
-
-  public function new(x:Float, y:Float)
+  public function new()
   {
-    super(x, y);
-    this.applyStageMatrix = true;
+    super(0, 0, "charSelect/gfChill");
 
-    switchGF(Constants.DEFAULT_CHARACTER);
+    list = anim.curSymbol.getFrameLabelNames();
+
+    switchGF("bf");
   }
 
+  override public function update(elapsed:Float):Void
+  {
+    super.update(elapsed);
+
+    switch (fadingStatus)
+    {
+      case OFF:
+        // do nothing if it's off!
+        // or maybe force position to be 0,0?
+        // maybe reset timers?
+        resetFadeAnimParams();
+      case FADE_OUT:
+        doFade(animOutInfo);
+      case FADE_IN:
+        doFade(animInInfo);
+      default:
+    }
+
+    #if FEATURE_DEBUG_FUNCTIONS
+    if (FlxG.keys.justPressed.J)
+    {
+      alpha = 1;
+      x = y = 0;
+      fadingStatus = FADE_OUT;
+    }
+    if (FlxG.keys.justPressed.K)
+    {
+      alpha = 0;
+      fadingStatus = FADE_IN;
+    }
+    #end
+  }
+
+
+  var danceEvery:Int = 2;
 
   public function onBeatHit(beat:Int):Void //? gather beat instead of event
   {
@@ -39,8 +84,8 @@ class CharSelectGF extends FunkinSprite
     // danceEvery isn't necessary if that gets fixed.
     if (getCurrentAnimation() == "idle" && (beat % danceEvery == 0))
     {
-      trace('GF beat hit');
-      anim.play("idle", true);
+      //trace('GF beat hit');
+      playAnimation("idle", true, false, false);
     }
   };
 
@@ -52,18 +97,19 @@ class CharSelectGF extends FunkinSprite
 
   function drawFFT()
   {
-    if (enableVisualizer && analyzer != null)
+    try{
+          if (enableVisualizer)
     {
-      analyzerLevelsCache = analyzer.getLevels(analyzerLevelsCache);
-      var frame:Null<animate.internal.Frame> = this.timeline.getLayer("VIZ_bars")?.getFrameAtIndex(anim.curAnim.curFrame) ?? null;
-      var elements:Array<animate.internal.elements.Element> = frame?.elements ?? [];
+      var levels = analyzer.getLevels();
+      var frame = anim.curSymbol.timeline.get("VIZ_bars").get(anim.curFrame);
+      var elements = frame.getList();
       var len:Int = cast Math.min(elements.length, 7);
 
       for (i in 0...len)
       {
-        var animFrame:Int = (FlxG.sound.volume == 0 || FlxG.sound.muted) ? 0 : Math.round(analyzerLevelsCache[i].value * 12);
+        var animFrame:Int = Math.round(levels[i].value * 12);
 
-        #if sys
+        #if desktop
         // Web version scales with the Flixel volume level.
         // This line brings platform parity but looks worse.
         // animFrame = Math.round(animFrame * FlxG.sound.volume);
@@ -74,12 +120,55 @@ class CharSelectGF extends FunkinSprite
 
         animFrame = Std.int(Math.abs(animFrame - 12)); // shitty dumbass flip, cuz dave got da shit backwards lol!
 
-        var convertedSymbol = elements[i].toSymbolInstance();
-        convertedSymbol.firstFrame = animFrame;
-
-        elements[i] = convertedSymbol;
+        elements[i].symbol.firstFrame = animFrame;
       }
     }
+    }
+    catch(x:Exception){
+      // tracing this would waste CPU
+    }
+  }
+
+  /**
+   * @param animInfo Should not be confused with animInInfo!
+   *                 This is merely a local var for the function!
+   */
+  function doFade(animInfo:FramesJSFLInfo):Void
+  {
+    fadeTimer += FlxG.elapsed;
+    if (fadeTimer >= 1 / 24)
+    {
+      fadeTimer -= FlxG.elapsed;
+      // only inc the index for the first frame, used for reference of where to "start"
+      if (fadeAnimIndex == 0)
+      {
+        fadeAnimIndex++;
+        return;
+      }
+
+      var curFrame:FramesJSFLFrame = animInfo.frames[fadeAnimIndex];
+      var prevFrame:FramesJSFLFrame = animInfo.frames[fadeAnimIndex - 1];
+
+      var xDiff:Float = curFrame.x - prevFrame.x;
+      var yDiff:Float = curFrame.y - prevFrame.y;
+      var alphaDiff:Float = curFrame.alpha - prevFrame.alpha;
+      alphaDiff /= 100; // flash exports alpha as a whole number
+
+      alpha += alphaDiff;
+      alpha = FlxMath.bound(alpha, 0, 1);
+      x += xDiff;
+      y += yDiff;
+
+      fadeAnimIndex++;
+    }
+
+    if (fadeAnimIndex >= animInfo.frames.length) fadingStatus = OFF;
+  }
+
+  function resetFadeAnimParams()
+  {
+    fadeTimer = 0;
+    fadeAnimIndex = 0;
   }
 
   /**
@@ -95,13 +184,11 @@ class CharSelectGF extends FunkinSprite
     }
     var bfObj = PlayerRegistry.instance.fetchEntry(bf);
     var gfData = bfObj?.getCharSelectData()?.gf;
-    var assetPath:Null<String> = gfData?.assetPath ?? "";
-
-    currentGFPath = assetPath;
+    currentGFPath = gfData?.assetPath != null ? gfData?.assetPath : null;
 
     // We don't need to update any anims if we didn't change GF
     trace('currentGFPath(${currentGFPath})');
-    if (currentGFPath == "")
+    if (currentGFPath == null)
     {
       this.visible = false;
       return;
@@ -109,24 +196,17 @@ class CharSelectGF extends FunkinSprite
     else if (previousGFPath != currentGFPath)
     {
       this.visible = true;
-
-      var path:String = currentGFPath;
-      var texture:Null<animate.FlxAnimateFrames> = CharSelectAtlasHandler.loadAtlas(path, {swfMode: true});
-      if (texture != null)
-      {
-        frames = texture;
-      }
-      else
-      {
-        this.visible = false;
-        currentGFPath = "";
-        return;
-      }
+      loadAtlas(currentGFPath);
 
       enableVisualizer = gfData?.visualizer ?? false;
+
+      var animInfoPath = 'images/${gfData?.animInfoPath}'; //? JSFL uses asset system!
+
+      animInInfo = FramesJSFLParser.parse(animInfoPath + '/In.txt');
+      animOutInfo = FramesJSFLParser.parse(animInfoPath + '/Out.txt');
     }
 
-    anim.play("idle", true);
+    playAnimation("idle", true, false, false);
 
     updateHitbox();
   }

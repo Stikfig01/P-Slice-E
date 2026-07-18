@@ -66,24 +66,26 @@ class CharSelectEditor extends MusicBeatState
 		bg.scrollFactor.set(0.1, 0.1);
 		add(bg);
 
-		var stageSpr:FunkinSprite = FunkinSprite.createTextureAtlas(cutoutSize - 20, 400, "charSelect/charSelectStage");
-		stageSpr.anim.addBySymbol('',"stage full");
-    	stageSpr.anim.play('');
-		stageSpr.anim.curAnim.looped = true;
+		var stageSpr:FlxAtlasSprite = new FlxAtlasSprite(cutoutSize + -2, 1, "charSelect/charSelectStage");
+		stageSpr.anim.play("");
+		stageSpr.anim.onComplete.add(function()
+		{
+			stageSpr.anim.play("");
+		});
 		add(stageSpr);
 
 		nametag = new Nametag(0, 0, initPlayerId); // ? Set to current char
 		nametag.midpointX += cutoutSize;
 		add(nametag);
 
-		gfChill = new CharSelectGF(0,0);
+		gfChill = new CharSelectGF();
 		gfChill.x += cutoutSize;
 		switchEditorGF(activePlayer._data.charSelect.gf);
 		add(gfChill);
 
 		playerChill = new CharSelectPlayer(cutoutSize*2.5, 0);
 		playerChill.switchChar(initPlayerId); // ? Set to current character
-		playerChill.anim.onFinish.removeAll(); // ? clear imposed triggers
+		playerChill.onAnimationComplete.removeAll(); // ? clear imposed triggers
 		add(playerChill);
 
 		var curtains:FlxSprite = new FlxSprite(cutoutSize + (-47 - 165), -49 - 50);
@@ -190,7 +192,7 @@ class CharSelectEditor extends MusicBeatState
 		else
 		{
 			gfChill.visible = true;
-			gfChill.switchGF(currentGFPath);
+			gfChill.loadAtlas(currentGFPath);
 
 			@:privateAccess
 			gfChill.enableVisualizer = gfData?.visualizer ?? false;
@@ -203,13 +205,13 @@ class CharSelectEditor extends MusicBeatState
 				);
 				animInfoPath = 'images/charSelect/gfAnimInfo';
 			}
-			// @:privateAccess {
-			// 	gfChill.animInInfo = FramesJSFLParser.parse(animInfoPath + '/In.txt');
-			// 	gfChill.animOutInfo = FramesJSFLParser.parse(animInfoPath + '/Out.txt');
-			// }
+			@:privateAccess {
+				gfChill.animInInfo = FramesJSFLParser.parse(animInfoPath + '/In.txt');
+				gfChill.animOutInfo = FramesJSFLParser.parse(animInfoPath + '/Out.txt');
+			}
 		}
 
-		gfChill.anim.play("idle", true, false);
+		gfChill.playAnimation("idle", true, false, false);
 		gfChill.updateHitbox();
 	}
 }

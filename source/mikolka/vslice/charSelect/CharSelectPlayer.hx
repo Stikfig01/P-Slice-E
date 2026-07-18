@@ -1,57 +1,32 @@
 package mikolka.vslice.charSelect;
 
 
-import mikolka.funkin.FunkinSprite;
-class CharSelectPlayer extends FunkinSprite
+import mikolka.funkin.FlxAtlasSprite;
+class CharSelectPlayer extends FlxAtlasSprite 
 {
-  static final DEFAULT_PATH = "charSelect/bfChill";
-
-  var initialX:Float = 0;
-  var initialY:Float = 0;
-
-  var currentBFPath:Null<String>;
-
   public function new(x:Float, y:Float)
   {
-    initialX = x;
-    initialY = y;
+    super(x, y, "charSelect/bfChill");
 
-    super(x, y);
-
-    loadTextureAtlas(DEFAULT_PATH,
-      {
-        applyStageMatrix: true,
-        swfMode: true
-      });
-
-    anim.onFinish.add(function(animLabel:String) {
+    onAnimationComplete.add(function(animLabel:String) { //? changed the hook here
       switch (animLabel)
       {
         case "slidein":
           if (hasAnimation("slidein idle point"))
           {
-            anim.play("slidein idle point", true);
+            playAnimation("slidein idle point", true, false, false);
           }
           else
           {
-            anim.play("idle", true);
-            anim.curAnim.looped = true;
+            playAnimation("idle", true, false, false);
           }
         case "deselect":
-          anim.play("deselect loop start", true);
+          playAnimation("deselect loop start", true, false, true);
+
         case "slidein idle point", "cannot select Label", "unlock":
-          anim.play("idle", true);
+          playAnimation("idle", true, false, false);
         case "idle":
           trace('Waiting for onBeatHit');
-
-          // TODO: once char select data is refactored, add a `shouldBop` field or something IDK
-          if (currentBFPath != null)
-          {
-            if (currentBFPath.endsWith("locked"))
-            {
-              anim.curAnim.looped = true;
-            }
-          }
       }
     });
   }
@@ -64,29 +39,40 @@ class CharSelectPlayer extends FunkinSprite
     // but isAnimationFinished() and isLoopComplete() both don't work! What the hell?
     // danceEvery isn't necessary if that gets fixed.
     //
-    if (getCurrentAnimation() == "idle" && isAnimationFinished())
+    if (getCurrentAnimation() == "idle")
     {
-      anim.play("idle", true);
+      //trace('Player beat hit');
+      playAnimation("idle", true, false, false);
     }
   };
 
-  public function switchChar(str:String, playSlideAnim:Bool = true):Void
+  public function updatePosition(str:String)
   {
-    var texture:Null<animate.FlxAnimateFrames> = CharSelectAtlasHandler.loadAtlas('charSelect/${str}Chill');
-
-    if (texture != null)
+    switch (str)
     {
-      frames = texture;
+      case "bf":
+        x = 0;
+        y = 0;
+      case "pico":
+        x = 0;
+        y = 0;
+      case "random":
     }
-    else
+  }
+
+  public function switchChar(str:String)
+  {
+    switch str
     {
-      trace('Failed to load character atlas for ${str}');
-      return;
+      default:
+        loadAtlas("charSelect/" + str + "Chill");
     }
 
-    final animName:String = playSlideAnim ? "slidein" : "idle";
-    anim.play(animName, true);
+    playAnimation("slidein", true, false, false);
 
     updateHitbox();
+
+    updatePosition(str);
   }
+
 }

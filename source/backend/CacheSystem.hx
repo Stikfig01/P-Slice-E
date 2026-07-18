@@ -1,6 +1,5 @@
 package backend;
 
-import animate.FlxAnimateFrames;
 import openfl.utils.AssetCache;
 import flixel.util.FlxStringUtil;
 import flixel.system.FlxAssets;
@@ -23,8 +22,8 @@ class CacheSystem
 	/**
 	 * A list of all cached graphics
 	 */
-	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];	
-	
+	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
+
 	/**
 	 * A list of cached sounds
 	 */
@@ -98,28 +97,17 @@ class CacheSystem
 		str.add("-- Managed bitmaps --");
 		str.add("\n");
 		var entries:Array<ImageLine> = [];
-		@:privateAccess{
-			for (key => texture in FlxG.bitmap._cache)
-				{
-					var inStored = currentTrackedAssets.exists(key) ? "S" : "-";
-					var inLocal = localTrackedAssets.contains(key) ? "L" : "-";
-					var memory = texture?.bitmap?.image?.data?.byteLength ?? 0;
-					entries.push({
-						size: memory,
-						text: '[ $inStored $inLocal ](${FlxStringUtil.formatBytes(memory)}) $key'
-					});
-					totalMemory += memory;
-				}
-				// Rest of the track list
-				var bitmapKeys = FlxG.bitmap._cache.keyValues();
-				for (key in currentTrackedAssets.keys()){
-					if(!bitmapKeys.contains(key)){
-						entries.push({
-							size: 0,
-							text: '[ S - ] #MISSING# $key'
-						});
-					}
-				}
+		@:privateAccess
+		for (key => texture in FlxG.bitmap._cache)
+		{
+			var inStored = currentTrackedAssets.exists(key) ? "S" : "-";
+			var inLocal = localTrackedAssets.contains(key) ? "L" : "-";
+			var memory = texture?.bitmap?.image?.data?.byteLength ?? 0;
+			entries.push({
+				size: memory,
+				text: '[ $inStored $inLocal ](${FlxStringUtil.formatBytes(memory)}) $key'
+			});
+			totalMemory += memory;
 		}
 		entries.sort((x, y) -> cast y.size - x.size);
 		for (entry in entries)
@@ -193,14 +181,8 @@ class CacheSystem
 	{
 		if (currentTrackedAssets.exists(key))
 		{
-			if(!currentTrackedAssets.get(key).isDestroyed){
-				localTrackedAssets.push(key);
-				return currentTrackedAssets.get(key);
-			}
-			else{
-				trace('${key} already destroyed? Removing from cache.');
-				currentTrackedAssets.remove(key);
-			}
+			localTrackedAssets.push(key);
+			return currentTrackedAssets.get(key);
 		}
 		var bitmap = __loadBitmap(key, parentFolder);
 		return cacheBitmap(key, bitmap, allowGPU);
@@ -337,7 +319,7 @@ class CacheSystem
 	{
 		// free some gpu memory
 		if (graphic != null && graphic.bitmap != null && graphic.bitmap.__texture != null)
-			graphic.bitmap.__texture.dispose();
+		graphic.bitmap.__texture.dispose();
 		FlxG.bitmap.remove(graphic);
 	}
 
@@ -351,6 +333,7 @@ class CacheSystem
 		{
 			trace('Bitmap not found: $file | key: $key');
 		}
+
 		return bitmap;
 	}
 

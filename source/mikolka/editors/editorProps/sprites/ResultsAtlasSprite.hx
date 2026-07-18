@@ -4,7 +4,7 @@ import mikolka.editors.editorProps.sprites.IResultsSprite;
 import mikolka.funkin.players.PlayerData.PlayerResultsAnimationData;
 import mikolka.compatibility.funkin.FunkinPath;
 
-class ResultsAtlasSprite extends FunkinSprite implements IResultsSprite
+class ResultsAtlasSprite extends FlxAtlasSprite implements IResultsSprite
 {
 	var data:PlayerResultsAnimationData;
 	var timer:Null<FlxTimer>;
@@ -23,7 +23,7 @@ class ResultsAtlasSprite extends FunkinSprite implements IResultsSprite
 		scale.set(animData.scale ?? 1.0, animData.scale ?? 1.0);
 
 		// Animation is not looped.
-		anim.onFinish.add((_name:String) ->
+		onAnimationComplete.add((_name:String) ->
 		{
 			trace("Pausing atlas anim");
 			if (animation == null)
@@ -34,13 +34,12 @@ class ResultsAtlasSprite extends FunkinSprite implements IResultsSprite
 			}
 			else if (animData.loopFrameLabel != null && animData.loopFrameLabel != "")
 			{
-				anim.play(animData.loopFrameLabel ?? '', true, false); // unpauses this anim, since it's on PlayOnce!
-				anim.curAnim.looped = true;
+				playAnimation(animData.loopFrameLabel ?? '', true, false, true); // unpauses this anim, since it's on PlayOnce!
 			}
 			else if (animData.loopFrame != null)
 			{
-				anim.frameIndex = animData.loopFrame ?? 0;
-				anim.resume(); // unpauses this anim, since it's on PlayOnce!
+				anim.curFrame = animData.loopFrame ?? 0;
+				anim.play(); // unpauses this anim, since it's on PlayOnce!
 			}
 		});
 		// Hide until ready to play.
@@ -52,13 +51,13 @@ class ResultsAtlasSprite extends FunkinSprite implements IResultsSprite
 		return ATLAS;
 	}
 
-	public function pauseAnimation() {
+	override function pauseAnimation() {
 		sound?.pause();
-		anim.pause();
+		super.pauseAnimation();
 		if (timer != null) timer.active = false;
 	}
-	public function resumeAnimation() {
-		anim.resume();
+	override function resumeAnimation() {
+		super.resumeAnimation();
 		sound?.resume();
 		if (timer != null) timer.active = true;
 	}
@@ -71,7 +70,7 @@ class ResultsAtlasSprite extends FunkinSprite implements IResultsSprite
 
 		if(!canShow) return;
 		timer = FlxTimer.wait(data.delay,() ->{
-			anim.play(data.startFrameLabel ?? ''); 
+			playAnimation(data.startFrameLabel ?? ''); 
 			sound?.play();
 			visible = true;
 		});
@@ -89,9 +88,9 @@ class ResultsAtlasSprite extends FunkinSprite implements IResultsSprite
 
 			visible = true;
 			if (data.loopFrame != null && data.looped)
-				anim.frameIndex = data.loopFrame;
+				anim.curFrame = data.loopFrame;
 			else
-				anim.frameIndex = anim.curAnim.frames.length-1;//animation.curAnim.numFrames - 1;
+				anim.curFrame = anim.curSymbol.length-1;//animation.curAnim.numFrames - 1;
 		} else visible = false;
 	}
 

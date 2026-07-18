@@ -25,7 +25,7 @@ class PicoCard extends BackingCard
   var glowDark:FlxSprite;
   var blueBar:FlxSprite;
 
-  var confirmAtlas:FunkinSprite;
+  var confirmAtlas:FlxAtlasSprite;
 
   public override function enterCharSel():Void
   {
@@ -143,22 +143,10 @@ class PicoCard extends BackingCard
     glow.visible = false;
     glowDark.visible = false;
 
-    confirmAtlas = FunkinSprite.createTextureAtlas(-120, 55, "freeplay/backingCards/pico/pico-confirm");
+    confirmAtlas = new FlxAtlasSprite(5, 55, "freeplay/backingCards/pico/pico-confirm");
     confirmAtlas.visible = false;
-    // confirmAtlas.scale.x *= MobileScaleMode.wideScale.x;
-    // confirmAtlas.x += ((confirmAtlas.width * MobileScaleMode.wideScale.x) - confirmAtlas.width) * 2.48;
-
-        // multiply the scale of the bg by 2
-    // this should be enough, since no phone screen should ever be bigger than whatever
-    // this gets scaled to
-    confirmAtlas.scaleElement(confirmAtlas.getFirstElement("backplate flat blue"), 2, 100);
-    confirmAtlas.scaleElement(confirmAtlas.getFirstElement("pink back"), 2, 100);
-    confirmAtlas.scaleElement(confirmAtlas.getFirstElement("black flash"), 2, 100);
-    confirmAtlas.scaleElement(confirmAtlas.getFirstElement("white flash"), 2, 100);
-    confirmAtlas.scaleElement(confirmAtlas.getFirstElement("blue flash"), 2, 100);
-    confirmAtlas.scaleElement(confirmAtlas.getFirstElement("blue flash 2"), 2, 100);
-    confirmAtlas.scaleElement(confirmAtlas.getFirstElement("pink flash"), 2, 100);
-
+    confirmAtlas.scale.x *= MobileScaleMode.wideScale.x;
+    confirmAtlas.x += ((confirmAtlas.width * MobileScaleMode.wideScale.x) - confirmAtlas.width) * 2.48;
     add(confirmAtlas);
 
     cardGlow.blend = BlendMode.ADD;

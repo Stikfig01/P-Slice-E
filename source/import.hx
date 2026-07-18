@@ -75,11 +75,9 @@ using mikolka.funkin.utils.custom.FunkinTools;
 import mikolka.funkin.utils.custom.FunkinTools;
 using mikolka.funkin.utils.ArrayTools;
 using mikolka.funkin.utils.SpriteTools;
-using mikolka.funkin.utils.FlxAnimationUtil;
 using mikolka.funkin.utils.custom.PsychUITools;
 using mikolka.funkin.utils.StringTools;
-using mikolka.funkin.utils.MapTools;
-using mikolka.funkin.utils.IteratorTools;
+
 
 
 // Stage imports (for compatibility)
@@ -113,6 +111,10 @@ import states.PlayState;
 import mikolka.vslice.ui.*;
 import states.LoadingState;
 
+#if flxanimate
+import flxanimate.*;
+import flxanimate.PsychFlxAnimate as FlxAnimate;
+#end
 
 // Mod libs
 import flixel.ui.FlxBar;

@@ -7,7 +7,7 @@ class DJAnimPreview extends AnimPreview {
     public var curOffset(get,null):Array<Float>;
     public var curAnimPrefix(get,set):String;
 
-    override function attachSprite(value:FunkinSprite) {
+    override function attachSprite(value:FlxAtlasSprite) {
         super.attachSprite(value);
         frameTxt.x = 0;
         frameTxt.y = 8;
@@ -16,7 +16,7 @@ class DJAnimPreview extends AnimPreview {
         frameTxt.size = 48;
     }
     // Adds anims + offsets
-    override function registerAnims(value:FunkinSprite) {
+    override function registerAnims(value:FlxAtlasSprite) {
         offsets = new Array<Array<Float>>();
         value.offset.set(0,0);
         @:privateAccess
@@ -34,10 +34,10 @@ class DJAnimPreview extends AnimPreview {
     }
 
 
-    override function onFrameAdvance(anim:String, frame:Int,frameIndex:Int)
+    override function onFrameAdvance(anim:String, frame:Int)
         {
             if(selectedAnimLength == 0) {
-                selectedAnimLength = activeSprite.anim.curAnim.frames.length; // timeline.totalFrames;
+                selectedAnimLength = activeSprite.anim.length; // timeline.totalFrames;
             }
             selectedFrame +=1;
             updateFramesText();
